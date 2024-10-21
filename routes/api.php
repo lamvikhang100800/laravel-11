@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AuthorizationController;
 use App\Http\Controllers\API\StaffController;
+use App\Http\Controllers\API\UserController;
+
 
 
 
@@ -19,21 +21,29 @@ Route::prefix('auth')->group(function(){
 });
 
 Route::prefix('authoriz')->group(function(){
-    Route::post('/add-user-role', [AuthorizationController::class, 'addUserToRole']);
-    Route::post('/add-permission-role', [AuthorizationController::class, 'addPermissionToRole']);
-    Route::post('/add-permission-user', [AuthorizationController::class, 'addPermissionToUser']);
 
-    Route::post('/remove-user-role', [AuthorizationController::class, 'removeUserFromRole']);
-    Route::post('/remove-permission-role', [AuthorizationController::class, 'removePermissionFromRole']);
-    Route::post('/remove-permission-user', [AuthorizationController::class, 'removePermissionFromUser']);
+    Route::get('/role-and-permisson', [AuthorizationController::class, 'getRolesAndPermissions']);
+    Route::post('/role-detail', [AuthorizationController::class, 'getRoleDetail']);
+    Route::post('/check-permission', [AuthorizationController::class, 'checkPermission']);
+    Route::post('/add-role', [AuthorizationController::class, 'addRole']);
+    Route::post('/add-permission', [AuthorizationController::class, 'addPermission']);
+    Route::post('/update-role-and-permission', [AuthorizationController::class, 'updateRoleAndPemission']);
 
-    Route::get('/permissions', [AuthorizationController::class, 'getUserPermissions']);
-    Route::get('/role-and-permisson', [AuthorizationController::class, 'getRolesAndPermisson']);
+
+
+
+
 
 });
 
 Route::prefix('staff')->group(function(){
     Route::post('/index', [StaffController::class, 'index']);
     Route::post('/create', [StaffController::class, 'create']);
+    
+});
+
+Route::prefix('user')->group(function(){
+    Route::post('/index', [UserController::class, 'index']);
+    Route::post('/create', [UserController::class, 'create']);
     
 });

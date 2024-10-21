@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\API;
 
 use Exception;
-use App\Models\Role;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Models\User ;
 
-class StaffController extends Controller implements HasMiddleware
-{   
+
+class UserController extends Controller implements HasMiddleware
+{
     public $user;
 
     public function __construct()
@@ -27,14 +28,15 @@ class StaffController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('check.jwt.session'),
-            new Middleware('check.role.and.permisson:user-modules,update-user')
+            new Middleware('check.role.and.permisson:user-module'),
+            new Middleware('check.role.and.permisson:user-module,read-user',only: ['index'])
+
         ];
     }
-    public function index(){
-        return response()->json(['message' => 'Staff Index']);
-    }
 
-    public function create(){
-        return response()->json(['message' => 'Staff Create']);
+    public function index(){
+        $users = User::all();
+
+        return response()->json($users , 200);
     }
 }

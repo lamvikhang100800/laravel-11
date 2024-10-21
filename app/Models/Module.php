@@ -3,18 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+class Module extends Model
+{
+    protected $table = 'tbl_modules';
 
-class Role extends Model
-{   
-    protected $table = 'tbl_roles';
-    protected $fillable = ['name', 'description','status'];
+    protected $fillable = [
+        'name',
+        'page_name',
+        'status'
+    ];
 
-    public function users(): BelongsToMany
+    public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'tbl_user_has_roles', 'role_id', 'user_id')
+        return $this->belongsToMany(Permission::class, 'tbl_role_has_permissions', 'module_id', 'permission_id')
+                    ->withPivot('role_id')
                     ->withTimestamps();
     }
 
@@ -25,5 +29,5 @@ class Role extends Model
     public function getUpdatedAtAttribute($value)
     {
         return \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s');
-    }   
+    } 
 }
