@@ -29,21 +29,24 @@ Route::prefix('authoriz')->group(function(){
     Route::post('/add-permission', [AuthorizationController::class, 'addPermission']);
     Route::post('/update-role-and-permission', [AuthorizationController::class, 'updateRoleAndPemission']);
 
-
-
-
-
-
 });
 
-Route::prefix('staff')->group(function(){
-    Route::post('/index', [StaffController::class, 'index']);
-    Route::post('/create', [StaffController::class, 'create']);
-    
-});
+
 
 Route::prefix('user')->group(function(){
     Route::post('/index', [UserController::class, 'index']);
     Route::post('/create', [UserController::class, 'create']);
+    Route::put('/update', [UserController::class, 'update']);
     
 });
+
+
+Route::prefix('staff')->group(function(){
+    Route::post('/index', [StaffController::class, 'index']);
+    Route::post('/create', [StaffController::class, 'create']);
+    Route::get('/test', [StaffController::class, 'test']);
+
+    
+});
+
+

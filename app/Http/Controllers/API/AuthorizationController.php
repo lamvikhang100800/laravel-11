@@ -9,6 +9,7 @@ use App\Models\UserRole;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 use App\Models\RolePermission;
+use App\Events\NotificationEvent;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
@@ -177,9 +178,17 @@ class AuthorizationController extends Controller implements HasMiddleware
                 'role_id' => $request->input('role_id'),
                 'user_id' => $userId
             ]);
+            
+            if($userId != 1){
+                $data = (object) [
+                    'type' => 'info',
+                    'message' => 'Your account has been updated with new permissions.',
+                    'url' => ''
+                ];
+                event(new NotificationEvent($data, $userId));
+            }
+            
         }
-
-
         return response()->json(['message' => 'Role and permissions updated successfully!'], 200);
 
     }

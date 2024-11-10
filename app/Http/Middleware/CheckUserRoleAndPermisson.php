@@ -4,10 +4,11 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Exception;
+use App\Models\Role;
+use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\Role;
 
 class CheckUserRoleAndPermisson
 {
@@ -16,7 +17,7 @@ class CheckUserRoleAndPermisson
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $module, $permission = null): Response
+    public function handle(Request $request, Closure $next, $permission): Response
     {
         try {
 
@@ -28,38 +29,20 @@ class CheckUserRoleAndPermisson
                 return $next($request);
             }
 
-            $modules = $user->getModuleAndPermisson();
-            $moduleExists = false;
-            $permissionExists = false;
+            $hasPermissions = UserRole::where('user_id', $user->id)
+            ->where('p.name',$permission)
+            ->from('tbl_user_has_roles as ur')
+            ->join('tbl_role_has_permissions as rp', 'ur.role_id', '=', 'rp.role_id')
+            ->join('tbl_permissions as p', 'rp.permission_id', '=', 'p.id')
+            ->select('p.name')
+            ->first();
 
-            foreach ($modules as $item) {
-                if ($item['module'] === $module) {
-                    $moduleExists = true;
-
-                    if ($permission) {
-                        foreach ($item['permissions'] as $perm) {
-                            if ($perm->name === $permission) {
-                                $permissionExists = true;
-                                break;
-                            }
-                        }
-                    }
-                    break; 
-                }
+            if($hasPermissions){
+                return $next($request);
             }
 
-            
-            if (!$moduleExists) {
-                return response()->json(['message' => 'Module not found'], 404);
-            }
+            return response()->json(['message' => 'Unauthorized'], 403);
 
-           
-            if ($permission && !$permissionExists) {
-                return response()->json(['message' => 'Permission denied'], 403);
-            }
-
-            return $next($request);
-            
         } catch (Exception $e) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
